@@ -104,6 +104,8 @@ struct eth_stats print_stats(struct app_config *aconf) {
 		rc.ipackets = stats.ipackets;
 		rc.opackets = stats.opackets;
 		rc.mpackets = stats.imissed;
+		rc.ibytes = stats.ibytes;
+		rc.obytes = stats.obytes;
 		RTE_LOG(INFO, APP, "Statistics: Rx: %9lu (%9lu pkts/s) Tx: %9lu (%9lu pkts/s) dropped: %9lu (%9lu pkts/s)\n", stats.ipackets, rc.ipacketsps, stats.opackets,
 		        rc.opacketsps, rc.mpackets, rc.mpacketsps);
 		old_ipackets = stats.ipackets;

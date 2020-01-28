@@ -27,5 +27,7 @@ message MetricsDatapoint {
   uint64 ipackets = 1;
   uint64 opackets = 2;
   uint64 dpackets = 3;
-  string mac = 4;
+  uint64 ibytes = 4;
+  uint64 obytes = 5;
+  string mac = 6;
 }

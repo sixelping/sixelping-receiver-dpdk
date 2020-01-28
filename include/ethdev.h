@@ -7,7 +7,7 @@
 #include "application_configuration.h"
 
 struct eth_stats {
-	uint64_t ipackets, opackets, mpackets;
+	uint64_t ipackets, opackets, mpackets, ibytes, obytes;
 	uint64_t ipacketsps, opacketsps, mpacketsps;
 	rte_ether_addr addr;
 };

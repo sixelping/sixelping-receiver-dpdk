@@ -53,6 +53,8 @@ void send_metrics(struct app_config *aconf, struct eth_stats stats) {
 	dp.set_ipackets(stats.ipackets);
 	dp.set_opackets(stats.opackets);
 	dp.set_dpackets(stats.mpackets);
+	dp.set_ibytes(stats.ibytes);
+	dp.set_obytes(stats.obytes);
 	dp.set_mac(mac);
 	
 	
