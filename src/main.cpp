@@ -138,10 +138,6 @@ int main(int argc, char *argv[]) {
 	
 	setup_ethernet_device(&aconf);
 	
-	aconf.ring = rte_ring_create("PACKETS", NUM_MBUFS, SOCKET_ID_ANY, (aconf.ethdev.nb_rx_queues <= 1) ? RING_F_SP_ENQ : 0);
-	if (aconf.ring == nullptr)
-		rte_panic("ring failure");
-	
 	rte_eal_mp_remote_launch(lcore_main, &aconf, CALL_MASTER);
 	
 	rte_eal_mp_wait_lcore();

@@ -44,7 +44,6 @@ struct app_config {
 	struct app_processing_config app;
 	struct app_grpc_config grpc;
 	struct rte_mempool *mbuf_pool;
-	struct rte_ring *ring;
 	uint8_t ipv6_address[16];
 	uint8_t ipv6_icmp_prefix[16];
 	uint8_t ipv6_icmp_prefix_cidr;

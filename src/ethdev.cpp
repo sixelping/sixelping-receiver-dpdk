@@ -18,6 +18,8 @@ void probe_ethernet_device(struct app_config *aconf) {
 		aconf->ethdev.nb_rx_queues = dev_info.max_rx_queues;
 	if (aconf->ethdev.nb_tx_queues <= 0)
 		aconf->ethdev.nb_tx_queues = dev_info.max_tx_queues;
+	aconf->ethdev.nb_rx_queues = std::min(aconf->ethdev.nb_rx_queues, dev_info.max_rx_queues);
+	aconf->ethdev.nb_tx_queues = std::min(aconf->ethdev.nb_tx_queues, dev_info.max_tx_queues);
 	RTE_LOG(INFO, APP, "\tNumber of used RX queues: %d\n", aconf->ethdev.nb_rx_queues);
 	RTE_LOG(INFO, APP, "\tNumber of used TX queues: %d\n", aconf->ethdev.nb_tx_queues);
 	

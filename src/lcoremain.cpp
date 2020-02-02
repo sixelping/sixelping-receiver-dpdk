@@ -55,29 +55,11 @@ int lcore_main(void *arg) {
 				continue;
 			}
 			
-			//Queue them in the ring
-			const unsigned nb_tx = rte_ring_enqueue_burst(aconf->ring, (void *const *) bufs, nb_rx, nullptr);
-			if (unlikely(nb_tx < nb_rx)) {
-				for (unsigned i = nb_tx; i < nb_rx; i++) {
-					nipktmfree(bufs[i]);
-				}
-			}
-			
-		}
-	} else {
-		while (!force_quit) {
-			struct rte_mbuf *bufs[aconf->app.process_burst_size];
-			unsigned nb_rx = rte_ring_dequeue_burst(aconf->ring, (void **) bufs, aconf->app.process_burst_size, nullptr);
-			
-			if (unlikely(nb_rx == 0)) {
-				rte_pause();
-				continue;
-			}
-			
 			for (uint16_t i = 0; i < nb_rx; i++) {
 				process_packet(aconf, bufs[i]);
 				nipktmfree(bufs[i]);
 			}
+			
 		}
 	}
 	
