@@ -29,7 +29,8 @@ void handle_new_pixel(struct app_config *aconf, uint16_t x, uint16_t y, uint8_t 
 	if (unlikely(index*4 >= aconf->pixels.buf_size))
 		return;
 	
-	uint32_t oldvalue = aconf->pixels.buffers[aconf->pixels.active_buffer % 2][index];
+	uint64_t active_buffer = aconf->pixels.active_buffer;
+	uint32_t oldvalue = aconf->pixels.buffers[active_buffer % 2][index];
 	
 	//If the pixel was already edited, add this edit to it.
 	if (oldvalue & PIXEL_CHANGED_MASK) {
@@ -39,7 +40,7 @@ void handle_new_pixel(struct app_config *aconf, uint16_t x, uint16_t y, uint8_t 
 	}
 	
 	uint32_t value = (r << 16) | (g << 8) | (b << 0);
-	aconf->pixels.buffers[aconf->pixels.active_buffer % 2][index] = PIXEL_CHANGED_MASK | value;
+	aconf->pixels.buffers[active_buffer % 2][index] = PIXEL_CHANGED_MASK | value;
 }
 
 uint32_t *swap_buffers(struct app_config *aconf) {
