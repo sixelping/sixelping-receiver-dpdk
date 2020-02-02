@@ -28,8 +28,18 @@ void handle_new_pixel(struct app_config *aconf, uint16_t x, uint16_t y, uint8_t 
 	uint32_t index = x + y * aconf->pixels.width;
 	if (unlikely(index*4 >= aconf->pixels.buf_size))
 		return;
-	uint32_t value = PIXEL_CHANGED_MASK | (r << 16) | (g << 8) | (b << 0);
-	aconf->pixels.buffers[aconf->pixels.active_buffer % 2][index] = value;
+	
+	uint32_t oldvalue = aconf->pixels.buffers[aconf->pixels.active_buffer % 2][index];
+	
+	//If the pixel was already edited, add this edit to it.
+	if (oldvalue & PIXEL_CHANGED_MASK) {
+		r = uint8_t( ((uint16_t)r + (uint16_t)((oldvalue >> 16) & 0xFF)) / 2 );
+		g = uint8_t( ((uint16_t)g + (uint16_t)((oldvalue >> 8) & 0xFF)) / 2 );
+		b = uint8_t( ((uint16_t)b + (uint16_t)((oldvalue >> 0) & 0xFF)) / 2 );
+	}
+	
+	uint32_t value = (r << 16) | (g << 8) | (b << 0);
+	aconf->pixels.buffers[aconf->pixels.active_buffer % 2][index] = PIXEL_CHANGED_MASK | value;
 }
 
 uint32_t *swap_buffers(struct app_config *aconf) {
@@ -37,7 +47,8 @@ uint32_t *swap_buffers(struct app_config *aconf) {
 	uint64_t next_buffer = (current_buffer + 1) % 2;
 	
 	if (unlikely(aconf->pixels.buffers[current_buffer] == nullptr)) {
-		rte_panic("Pixel buffer %lu is null!\n", current_buffer);
+		rte_panic("Pixel buffer %lu is null!\n",
+		current_buffer);
 	}
 	
 	if (unlikely(aconf->pixels.buffers[next_buffer] == nullptr)) {
