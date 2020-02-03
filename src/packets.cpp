@@ -104,8 +104,9 @@ void format_ipv6_addr(char* buf, size_t size, uint8_t* addr) {
 
 inline void
 process_packet_icmp_echo_request(struct app_config *aconf, struct rte_mbuf *pkt, size_t offset, struct rte_ether_hdr *eth, struct rte_ipv6_hdr *ip, struct icmp6_hdr *icmp) {
-	//TODO: Check prefix math
-	//TODO: Check xy math
+	//Drop overly big packets. No need to let people flood us with bandwidth.
+	if (rte_pktmbuf_pkt_len(pkt) > 200)
+		return;
 	
 	uint8_t i, fb = aconf->ipv6_icmp_prefix_cidr / 8;
 	for (i = 0; i < fb && i < 15; i++) {
@@ -167,6 +168,7 @@ inline void process_packet_l2(struct app_config *aconf, struct rte_mbuf *pkt, si
 }
 
 void process_packet(struct app_config *aconf, struct rte_mbuf *pkt) {
+	
 	if (rte_pktmbuf_pkt_len(pkt) >= sizeof(struct rte_ether_hdr)) {
 		struct rte_ether_hdr *eth = rte_pktmbuf_mtod(pkt, struct rte_ether_hdr *);
 		process_packet_l2(aconf, pkt, sizeof(struct rte_ether_hdr), eth);
