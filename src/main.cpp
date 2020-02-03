@@ -95,6 +95,10 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 		rte_panic("Required parameters are missing!\n");
 	}
 	
+	if (aconf->ethdev.nb_rx_queues == 0) {
+		aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(rte_lcore_count() - 1);
+	}
+	
 	RTE_LOG(INFO, APP, "Configuration:\n");
 	RTE_LOG(INFO, APP, "\tAddress: %s\n", format_v6(aconf->ipv6_address).c_str());
 	RTE_LOG(INFO, APP, "\tPrefix: %s/%u\n", format_v6(aconf->ipv6_icmp_prefix).c_str(), aconf->ipv6_icmp_prefix_cidr);
