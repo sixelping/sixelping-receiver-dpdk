@@ -3,6 +3,7 @@
 //
 
 #include "grpc-helper.h"
+#include "packets.h"
 
 void setup_grpc(struct app_config *aconf) {
 	RTE_LOG(INFO, APP, "Setting up GRPC...\n");
@@ -56,6 +57,14 @@ void send_metrics(struct app_config *aconf, struct eth_stats stats) {
 	dp.set_ibytes(stats.ibytes);
 	dp.set_obytes(stats.obytes);
 	dp.set_mac(mac);
+	
+	auto& ipcounters = *dp.mutable_ipcounters();
+	
+	for (auto& [k,v] : aconf->pixels.senders) {
+		char ip[64];
+		format_ipv6_addr(ip, 64, (uint8_t*)&k);
+		ipcounters[std::string(ip)] = v.load();
+	}
 	
 	
 	grpc::ClientContext context;

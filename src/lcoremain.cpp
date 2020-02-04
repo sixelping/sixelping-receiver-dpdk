@@ -27,6 +27,7 @@ int lcore_main(void *arg) {
 			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastMetrics >= 1000ms) {
 				send_metrics(aconf, print_stats(aconf));
+				
 				lastMetrics = now;
 			}
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {

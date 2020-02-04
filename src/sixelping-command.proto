@@ -30,4 +30,5 @@ message MetricsDatapoint {
   uint64 ibytes = 4;
   uint64 obytes = 5;
   string mac = 6;
+  map<string,uint64> ipcounters = 7;
 }

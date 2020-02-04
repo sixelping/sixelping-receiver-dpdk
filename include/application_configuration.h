@@ -9,6 +9,8 @@
 #include <grpc++/grpc++.h>
 #include <sixelping-command.grpc.pb.h>
 
+typedef unsigned __int128 ipv6_addr_t;
+
 struct app_ethernet_config {
 	uint8_t port_id;
 	uint16_t first_rx_queue_id;
@@ -26,6 +28,7 @@ struct app_pixels_config {
 	uint16_t width;
 	uint16_t height;
 	uint16_t fps;
+	std::unordered_map<ipv6_addr_t,std::atomic_uint64_t> senders;
 };
 
 struct app_grpc_config {
