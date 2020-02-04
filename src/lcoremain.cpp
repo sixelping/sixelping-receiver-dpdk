@@ -42,7 +42,7 @@ int lcore_main(void *arg) {
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {
 				uint32_t *buffer = swap_buffers(aconf);
 				std::vector<uint8_t> image(aconf->pixels.buf_size);
-				for (size_t i = 0; i < aconf->pixels.buf_size; i++) {
+				for (size_t i = 0; i < aconf->pixels.width*aconf->pixels.height; i++) {
 					uint8_t *j = (uint8_t*)&buffer[i];
 					for (size_t k = 0; k < sizeof(uint32_t); k++)
 						image.push_back(j[k]);
