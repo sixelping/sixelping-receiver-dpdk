@@ -6,6 +6,7 @@
 #include "lcoremain.h"
 #include <getopt.h>
 #include <arpa/inet.h>
+#include "prometheus.h"
 
 uint16_t hex_to_int(char c) {
 	if ('0' <= c && c <= '9') {
@@ -55,11 +56,14 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 		{"grpc-address", required_argument, nullptr, 'h'},
 		{"rxqueues",     required_argument, nullptr, 'r'},
 		{"txqueues",     required_argument, nullptr, 't'},
+		{"prom-listen",     required_argument, nullptr, 'm'},
 		{0, 0,                              0,       0},
 	};
 	
 	//Default value
 	aconf->grpc.host = "localhost:50051";
+	aconf->prom.listen = "[::]:50053";
+	aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(rte_lcore_count() - 1);
 	
 	bool set_addr = false, set_prefix = false, set_host = false;
 	int option_index = 0;
@@ -80,6 +84,9 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 				aconf->grpc.host = std::string(optarg);
 				set_host = true;
 				break;
+			case 'm':
+				aconf->prom.listen = std::string(optarg);
+				break;
 			case 'r':
 				aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(std::atoi(optarg));
 				break;
@@ -93,10 +100,6 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 	
 	if (!set_addr || !set_prefix || !set_host) {
 		rte_panic("Required parameters are missing!\n");
-	}
-	
-	if (aconf->ethdev.nb_rx_queues == 0) {
-		aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(rte_lcore_count() - 1);
 	}
 	
 	RTE_LOG(INFO, APP, "Configuration:\n");
@@ -137,6 +140,8 @@ int main(int argc, char *argv[]) {
 		rte_panic("mbuf_pool create failed: %d\n", rte_errno);
 	
 	setup_grpc(&aconf);
+	
+	setup_prometheus(&aconf);
 	
 	setup_pixels(&aconf);
 	

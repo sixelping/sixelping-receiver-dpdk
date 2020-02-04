@@ -5,6 +5,9 @@
 #include "../include/ethdev.h"
 
 void probe_ethernet_device(struct app_config *aconf) {
+	char mac[64];
+	struct rte_ether_addr mac_addr = {};
+	
 	RTE_LOG(INFO, APP, "Querying ethernet device...\n");
 	//Determine the ethernet port to use
 	aconf->ethdev.port_id = determine_ethernet_port_id();
@@ -39,6 +42,10 @@ void probe_ethernet_device(struct app_config *aconf) {
 	
 	RTE_LOG(INFO, APP, "\tRX burst size: %d\n", aconf->app.rx_burst_size);
 	RTE_LOG(INFO, APP, "\tProcess burst size: %d\n", aconf->app.process_burst_size);
+	
+	rte_eth_macaddr_get(aconf->ethdev.port_id, &mac_addr);
+	rte_ether_format_addr(mac, 64, &mac_addr);
+	aconf->ethdev.formatted_mac = std::string(mac);
 	
 	RTE_LOG(INFO, APP, "Done querying ethernet device!\n");
 }
