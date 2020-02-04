@@ -60,6 +60,7 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 	
 	//Default value
 	aconf->grpc.host = "localhost:50051";
+	aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(rte_lcore_count() - 2);
 	
 	bool set_addr = false, set_prefix = false, set_host = false;
 	int option_index = 0;
@@ -93,10 +94,6 @@ void populate_aconf(struct app_config *aconf, int argc, char *argv[]) {
 	
 	if (!set_addr || !set_prefix || !set_host) {
 		rte_panic("Required parameters are missing!\n");
-	}
-	
-	if (aconf->ethdev.nb_rx_queues == 0) {
-		aconf->ethdev.nb_rx_queues = static_cast<uint16_t>(rte_lcore_count() - 1);
 	}
 	
 	RTE_LOG(INFO, APP, "Configuration:\n");

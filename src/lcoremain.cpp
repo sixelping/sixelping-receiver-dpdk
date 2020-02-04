@@ -19,10 +19,10 @@ int lcore_main(void *arg) {
 	
 	RTE_LOG(INFO, APP, "Starting core %u, index %u.\n", lcore_id, lcore_index);
 	if (lcore_index == 0) {
-		RTE_LOG(INFO, APP, "Core %u is working the UI and sockets.\n", lcore_id);
+		RTE_LOG(INFO, APP, "Core %u is working the metrics.\n", lcore_id);
 		
 		using namespace std::chrono_literals;
-		std::chrono::time_point lastMetrics = std::chrono::system_clock::now(), lastUpdate = std::chrono::system_clock::now();
+		std::chrono::time_point lastMetrics = std::chrono::system_clock::now();
 		while (!force_quit) {
 			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastMetrics >= 1000ms) {
@@ -30,6 +30,15 @@ int lcore_main(void *arg) {
 				
 				lastMetrics = now;
 			}
+			rte_delay_ms(10);
+		}
+	} else if (lcore_index == 1) {
+		RTE_LOG(INFO, APP, "Core %u is working the frames.\n", lcore_id);
+		
+		using namespace std::chrono_literals;
+		std::chrono::time_point lastUpdate = std::chrono::system_clock::now();
+		while (!force_quit) {
+			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {
 				uint32_t *buffer = swap_buffers(aconf);
 				auto png = buffer_to_png(aconf, buffer);
@@ -40,9 +49,10 @@ int lcore_main(void *arg) {
 				}
 				lastUpdate = now;
 			}
-			rte_delay_ms(10);
+			rte_delay_ms(1);
 		}
-	} else if (lcore_index > 0 && lcore_index <= aconf->ethdev.nb_rx_queues) {
+		
+	} else if (lcore_index > 1 && lcore_index <= aconf->ethdev.nb_rx_queues) {
 		uint16_t queue_id = aconf->ethdev.first_rx_queue_id + lcore_index - 1;
 		RTE_LOG(INFO, APP, "Core %u is working RX queue %u.\n", lcore_id, queue_id);
 		struct rte_mbuf *bufs[aconf->app.rx_burst_size];
