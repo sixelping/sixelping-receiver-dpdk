@@ -41,8 +41,7 @@ int lcore_main(void *arg) {
 			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {
 				uint32_t *buffer = swap_buffers(aconf);
-				std::vector<uint8_t> image(aconf->pixels.buf_size);
-				memcpy(image.data(), buffer, aconf->pixels.buf_size);
+				std::vector<uint8_t> image(buffer, buffer + aconf->pixels.buf_size);
 				send_frame_update(aconf, image);
 				lastUpdate = now;
 			}
