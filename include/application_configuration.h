@@ -8,15 +8,6 @@
 #include <atomic>
 #include <grpc++/grpc++.h>
 #include <sixelping-command.grpc.pb.h>
-#include <prometheus/exposer.h>
-#include <prometheus/registry.h>
-#include <prometheus/counter.h>
-
-struct app_prometheus_config {
-	std::string listen;
-	std::shared_ptr<prometheus::Exposer> exposer;
-	std::shared_ptr<prometheus::Registry> registry;
-};
 
 struct app_ethernet_config {
 	uint8_t port_id;
@@ -26,7 +17,6 @@ struct app_ethernet_config {
 	uint16_t nb_tx_queues;
 	uint16_t rx_descs;
 	uint16_t tx_descs;
-	std::string formatted_mac;
 };
 
 struct app_pixels_config {
@@ -53,7 +43,6 @@ struct app_config {
 	struct app_pixels_config pixels;
 	struct app_processing_config app;
 	struct app_grpc_config grpc;
-	struct app_prometheus_config prom;
 	struct rte_mempool *mbuf_pool;
 	uint8_t ipv6_address[16];
 	uint8_t ipv6_icmp_prefix[16];

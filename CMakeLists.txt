@@ -6,19 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(PNG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
-include(FetchContent)
 
-
-set(ENABLE_TESTING NO)
-
-FetchContent_Declare(
-	prometheus-cpp
-	GIT_REPOSITORY https://github.com/jupp0r/prometheus-cpp.git
-	GIT_TAG        v0.8.0
-)
-
-# CMake 3.14+
-FetchContent_MakeAvailable(prometheus-cpp)
 
 set(PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/src/sixelping-command.proto)
 
@@ -33,7 +21,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Wno-unused-parameter
 set(RTE_SDK /usr/share/dpdk)
 set(RTE_TARGET x86_64-default-linux-gcc)
 
-add_executable(sixelping_receiver_dpdk ${PROTO_SRCS} ${GRPC_SRCS} src/main.cpp include/icmp6.h include/common.h include/application_configuration.h src/ethdev.cpp include/ethdev.h src/packets.cpp include/packets.h src/pixels.cpp include/pixels.h src/grpc-helper.cpp include/grpc-helper.h src/lcoremain.cpp include/lcoremain.h src/pktmbuf.c src/prometheus.cpp include/prometheus.h)
+add_executable(sixelping_receiver_dpdk ${PROTO_SRCS} ${GRPC_SRCS} src/main.cpp include/icmp6.h include/common.h include/application_configuration.h src/ethdev.cpp include/ethdev.h src/packets.cpp include/packets.h src/pixels.cpp include/pixels.h src/grpc-helper.cpp include/grpc-helper.h src/lcoremain.cpp include/lcoremain.h src/pktmbuf.c)
 
 target_include_directories(sixelping_receiver_dpdk PUBLIC ${RTE_SDK}/${RTE_TARGET}/include /usr/include/dpdk/ /usr/include/x86_64-linux-gnu/dpdk/)
 target_link_directories(sixelping_receiver_dpdk PUBLIC ${RTE_SDK}/${RTE_TARGET}/lib)
@@ -46,6 +34,4 @@ target_link_libraries(sixelping_receiver_dpdk ${DPDK_LIBS})
 target_link_libraries(sixelping_receiver_dpdk pthread dl rt m numa)
 target_link_libraries(sixelping_receiver_dpdk PNG::PNG)
 target_link_libraries(sixelping_receiver_dpdk gRPC::grpc++_reflection protobuf::libprotobuf)
-target_link_libraries(sixelping_receiver_dpdk prometheus-cpp::core)
-target_link_libraries(sixelping_receiver_dpdk prometheus-cpp::pull)
 set_target_properties(sixelping_receiver_dpdk PROPERTIES COMPILE_FLAGS ${CMAKE_CXX_FLAGS})

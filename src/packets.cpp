@@ -4,7 +4,6 @@
 #include "../include/packets.h"
 #include "../include/icmp6.h"
 #include "pixels.h"
-#include "prometheus.h"
 
 inline void
 process_packet_icmp_neighbor_sollicit(struct app_config *aconf, struct rte_mbuf *pkt, size_t offset, struct rte_ether_hdr *eth, struct rte_ipv6_hdr *ip, struct icmp6_hdr *icmp,
@@ -93,19 +92,13 @@ process_packet_icmp_neighbor_sollicit(struct app_config *aconf, struct rte_mbuf 
 	}
 }
 
-void _format_ipv6_addr(char* buf, size_t size, uint8_t* addr) {
+void format_ipv6_addr(char* buf, size_t size, uint8_t* addr) {
 	snprintf(buf, size, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
 	         addr[0], addr[1], addr[2], addr[3],
 	         addr[4], addr[5], addr[6], addr[7],
 	         addr[8], addr[9], addr[10], addr[11],
 	         addr[12], addr[13], addr[14], addr[15]
 	);
-}
-
-std::string format_ipv6_addr(uint8_t *addr) {
-	char str[64];
-	_format_ipv6_addr(str, 64, addr);
-	return std::string(str);
 }
 
 
@@ -138,7 +131,7 @@ process_packet_icmp_echo_request(struct app_config *aconf, struct rte_mbuf *pkt,
 	uint8_t r = ip->dst_addr[11], g = ip->dst_addr[13], b = ip->dst_addr[15];
 	
 	handle_new_pixel(aconf, x, y, r, g, b);
-	record_ping(aconf, format_ipv6_addr(ip->src_addr));
+	
 }
 
 inline void process_packet_icmp(struct app_config *aconf, struct rte_mbuf *pkt, size_t offset, struct rte_ether_hdr *eth, struct rte_ipv6_hdr *ip, struct icmp6_hdr *icmp) {
