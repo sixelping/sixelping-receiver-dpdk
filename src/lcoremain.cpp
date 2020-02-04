@@ -30,7 +30,7 @@ int lcore_main(void *arg) {
 				
 				lastMetrics = now;
 			}
-			rte_delay_ms(10);
+			rte_delay_ms(100);
 		}
 	} else if (lcore_index == 1) {
 		RTE_LOG(INFO, APP, "Core %u is working the frames.\n", lcore_id);
