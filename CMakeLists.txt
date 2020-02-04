@@ -17,8 +17,11 @@ FetchContent_Declare(
 	GIT_TAG        v0.8.0
 )
 
-# CMake 3.14+
-FetchContent_MakeAvailable(prometheus-cpp)
+FetchContent_GetProperties(prometheus-cpp)
+if(NOT prometheus-cpp_POPULATED)
+	FetchContent_Populate(prometheus-cpp)
+	add_subdirectory(${prometheus-cpp_SOURCE_DIR} ${prometheus-cpp_BINARY_DIR})
+endif()
 
 set(PROTOS ${CMAKE_CURRENT_SOURCE_DIR}/src/sixelping-command.proto)
 
