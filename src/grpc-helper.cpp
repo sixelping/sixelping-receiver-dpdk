@@ -11,7 +11,7 @@ void setup_grpc(struct app_config *aconf) {
 	auto creds = grpc::InsecureChannelCredentials();
 	RTE_LOG(INFO, APP, "\tCreating channel...\n");
 	grpc::ChannelArguments ch_args;
-	ch_args.SetMaxReceiveMessageSize(-1);
+	ch_args.SetMaxReceiveMessageSize(64000000);
 	std::shared_ptr<grpc::Channel> channel = grpc::CreateCustomChannel(aconf->grpc.host, creds, ch_args);
 	RTE_LOG(INFO, APP, "\tCreating stub...\n");
 	aconf->grpc.grpc_stub = SixelpingRenderer::NewStub(channel);
