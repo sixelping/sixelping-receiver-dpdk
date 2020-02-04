@@ -10,8 +10,9 @@ void setup_grpc(struct app_config *aconf) {
 	RTE_LOG(INFO, APP, "\tCreating channel credentials...\n");
 	auto creds = grpc::InsecureChannelCredentials();
 	RTE_LOG(INFO, APP, "\tCreating channel...\n");
-	//std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel(aconf->grpc.host, creds);
-	std::shared_ptr<grpc::Channel> channel = grpc::CreateChannel("127.0.0.1:50051", creds);
+	grpc::ChannelArguments ch_args;
+	ch_args.SetMaxReceiveMessageSize(-1);
+	std::shared_ptr<grpc::Channel> channel = grpc::CreateCustomChannel(aconf->grpc.host, creds, ch_args);
 	RTE_LOG(INFO, APP, "\tCreating stub...\n");
 	aconf->grpc.grpc_stub = SixelpingRenderer::NewStub(channel);
 	RTE_LOG(INFO, APP, "\tAttempting retrieve canvas parameters from renderer...\n");
