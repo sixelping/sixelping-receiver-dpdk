@@ -41,12 +41,9 @@ int lcore_main(void *arg) {
 			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {
 				uint32_t *buffer = swap_buffers(aconf);
-				auto png = buffer_to_png(aconf, buffer);
-				if (png) {
-					send_frame_update(aconf, *png);
-				} else {
-					RTE_LOG(WARNING, APP, "Failed to convert delta buffer to png. Cycle is lost.\n");
-				}
+				std::vector<uint8_t> image(aconf->pixels.buf_size);
+				memcpy(image.data(), buffer, aconf->pixels.buf_size);
+				send_frame_update(aconf, image);
 				lastUpdate = now;
 			}
 			rte_delay_ms(1);
