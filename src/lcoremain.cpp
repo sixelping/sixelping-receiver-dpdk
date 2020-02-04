@@ -53,7 +53,7 @@ int lcore_main(void *arg) {
 		}
 		
 	} else if (lcore_index > 1 && lcore_index <= aconf->ethdev.nb_rx_queues) {
-		uint16_t queue_id = aconf->ethdev.first_rx_queue_id + lcore_index - 1;
+		uint16_t queue_id = aconf->ethdev.first_rx_queue_id + lcore_index - 2;
 		RTE_LOG(INFO, APP, "Core %u is working RX queue %u.\n", lcore_id, queue_id);
 		struct rte_mbuf *bufs[aconf->app.rx_burst_size];
 		
