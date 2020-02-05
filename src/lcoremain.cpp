@@ -50,14 +50,22 @@ int lcore_main(void *arg) {
 					uint16_t gValue = (value >> 16) & 0xFFFF;
 					uint16_t bValue = (value >> 0) & 0xFFFF;
 					
-					rValue /= aValue;
-					gValue /= aValue;
-					bValue /= aValue;
+					if (aValue > 0) {
+						rValue /= aValue;
+						gValue /= aValue;
+						bValue /= aValue;
+						aValue = 0xFF;
+					} else {
+						rValue = 0x0;
+						gValue = 0x0;
+						bValue = 0x0;
+						aValue = 0x0;
+					}
 					
 					target[4*i + 0] = bValue;
 					target[4*i + 1] = gValue;
 					target[4*i + 2] = rValue;
-					target[4*i + 3] = 0xFF;
+					target[4*i + 3] = aValue;
 				}
 				send_frame_update(aconf, image);
 				lastUpdate = now;
