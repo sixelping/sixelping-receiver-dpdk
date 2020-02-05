@@ -23,7 +23,7 @@ struct app_ethernet_config {
 
 struct app_pixels_config {
 	std::atomic_uint64_t active_buffer;
-	uint32_t *buffers[2];
+	uint64_t *buffers[2];
 	uint64_t buf_size;
 	uint16_t width;
 	uint16_t height;

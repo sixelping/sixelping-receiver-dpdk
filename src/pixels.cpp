@@ -5,18 +5,16 @@
 #include "pixels.h"
 #include <png.h>
 
-constexpr uint32_t PIXEL_CHANGED_MASK = (((uint8_t) 0xFF) << 24);
-
 void setup_pixels(struct app_config *aconf) {
 	aconf->pixels.active_buffer = 0;
-	aconf->pixels.buf_size = sizeof(uint32_t) * aconf->pixels.width * aconf->pixels.height;
+	aconf->pixels.buf_size = sizeof(uint64_t) * aconf->pixels.width * aconf->pixels.height;
 	if (aconf->pixels.buf_size == 0) {
 		rte_panic("Zero size buffer allocation!\n");
 	}
-	aconf->pixels.buffers[0] = static_cast<uint32_t *>(malloc(aconf->pixels.buf_size));
+	aconf->pixels.buffers[0] = static_cast<uint64_t *>(malloc(aconf->pixels.buf_size));
 	if (aconf->pixels.buffers[0] == nullptr)
 		rte_panic("Unable to allocate pixel buffer 0!\n");
-	aconf->pixels.buffers[1] = static_cast<uint32_t *>(malloc(aconf->pixels.buf_size));
+	aconf->pixels.buffers[1] = static_cast<uint64_t *>(malloc(aconf->pixels.buf_size));
 	if (aconf->pixels.buffers[1] == nullptr)
 		rte_panic("Unable to allocate pixel buffer 1!\n");
 	
@@ -30,20 +28,23 @@ void handle_new_pixel(struct app_config *aconf, uint16_t x, uint16_t y, uint8_t 
 		return;
 	
 	uint64_t active_buffer = aconf->pixels.active_buffer;
-	uint32_t oldvalue = aconf->pixels.buffers[active_buffer % 2][index];
+	uint64_t value = aconf->pixels.buffers[active_buffer % 2][index];
 	
-	//If the pixel was already edited, add this edit to it.
-	if (oldvalue & PIXEL_CHANGED_MASK) {
-		r = uint8_t( ((uint16_t)r + (uint16_t)((oldvalue >> 16) & 0xFF)) / 2 );
-		g = uint8_t( ((uint16_t)g + (uint16_t)((oldvalue >> 8) & 0xFF)) / 2 );
-		b = uint8_t( ((uint16_t)b + (uint16_t)((oldvalue >> 0) & 0xFF)) / 2 );
-	}
+	uint16_t aValue = (value >> 48) & 0xFFFF;
+	uint16_t rValue = (value >> 32) & 0xFFFF;
+	uint16_t gValue = (value >> 16) & 0xFFFF;
+	uint16_t bValue = (value >> 0) & 0xFFFF;
 	
-	uint32_t value = (r << 16) | (g << 8) | (b << 0);
-	aconf->pixels.buffers[active_buffer % 2][index] = PIXEL_CHANGED_MASK | value;
+	aValue++;
+	rValue += r;
+	gValue += g;
+	bValue += b;
+	
+	value = (((uint64_t)aValue) << 48) | (((uint64_t)rValue) << 32) | (((uint64_t)gValue) << 16) | (((uint64_t)bValue) << 0);
+	aconf->pixels.buffers[active_buffer % 2][index] = value;
 }
 
-uint32_t *swap_buffers(struct app_config *aconf) {
+uint64_t *swap_buffers(struct app_config *aconf) {
 	uint64_t current_buffer = aconf->pixels.active_buffer % 2;
 	uint64_t next_buffer = (current_buffer + 1) % 2;
 	

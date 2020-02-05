@@ -37,12 +37,28 @@ int lcore_main(void *arg) {
 		
 		using namespace std::chrono_literals;
 		std::chrono::time_point lastUpdate = std::chrono::system_clock::now();
-		std::vector<uint8_t> image(aconf->pixels.buf_size);
+		std::vector<uint8_t> image(aconf->pixels.width*aconf->pixels.height*4);
 		while (!force_quit) {
 			std::chrono::time_point now = std::chrono::system_clock::now();
 			if (now - lastUpdate >= (1000ms / aconf->pixels.fps)) {
-				uint32_t *buffer = swap_buffers(aconf);
-				std::memcpy(image.data(), buffer, aconf->pixels.buf_size);
+				uint64_t *buffer = swap_buffers(aconf);
+				uint8_t *target = image.data();
+				for (size_t i = 0; i < aconf->pixels.width*aconf->pixels.height; i++) {
+					uint64_t value = buffer[i];
+					uint16_t aValue = (value >> 48) & 0xFFFF;
+					uint16_t rValue = (value >> 32) & 0xFFFF;
+					uint16_t gValue = (value >> 16) & 0xFFFF;
+					uint16_t bValue = (value >> 0) & 0xFFFF;
+					
+					rValue /= aValue;
+					gValue /= aValue;
+					bValue /= aValue;
+					
+					target[4*i + 0] = bValue;
+					target[4*i + 1] = gValue;
+					target[4*i + 2] = rValue;
+					target[4*i + 3] = 0xFF;
+				}
 				send_frame_update(aconf, image);
 				lastUpdate = now;
 			}
